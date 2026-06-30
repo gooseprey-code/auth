@@ -17,7 +17,6 @@ import { sendVerificationEmail, sendWelcomeEmail, sendResetPasswordEmail } from 
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
-  console.log("Login attempt for email:", email);
   if (!email || !password) {
     return res.status(400).json({
       message: "All fields required",
@@ -75,7 +74,6 @@ export const login = async (req, res) => {
 
 export const signup = async (req, res) => {
     const { firstName, lastName, email, password } = req.body
-  console.log("im here")
     if(!firstName || !lastName || !password || !email) return res.status(400).json({ message: "All fields required" })
 
     const normalizedEmail = email.toLowerCase()
@@ -116,7 +114,7 @@ export const signup = async (req, res) => {
                 lastName: newUser.lastName,
                 email: newUser.email,
                 verificationTokenExpiresAt: newUser.verificationTokenExpiresAt,
-                isVerified: newUser.isVerified
+                isVerified: newUser.isVerified,
             },
             message: "New user created successfully"
         })
@@ -128,7 +126,6 @@ export const signup = async (req, res) => {
 
 export const signupGoogle = async (req, res) => {
     const { firstName, lastName, email, password } = req.body
-  console.log("im here")
     if(!firstName || !lastName || !password || !email) return res.status(400).json({ message: "All fields required" })
 
     const normalizedEmail = email.toLowerCase()
@@ -282,7 +279,6 @@ export const resendVerificationToken = async (req, res) => {
     },message: "A new token has been sent to your email" })
 
   } catch (error) {
-    console.log(error)
     res.status(500).json({ message: "Internal server error" })
   }
 }
@@ -358,8 +354,6 @@ export const addUsername = async (req, res) => {
 export const usernameAvailability = async (req, res) => {
   const { username } = req.body
 
-  console.log("Checking availability for username:", username);
-
   const regex = /^[A-Za-z][A-Za-z0-9._]{3,19}$/
 
   const usernameLowerCase = username.toLowerCase()
@@ -389,7 +383,6 @@ export const usernameAvailability = async (req, res) => {
     })
 
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       success: false,
       message: "Server Error"
@@ -399,7 +392,6 @@ export const usernameAvailability = async (req, res) => {
 
 export const suggestedUsernames = async (req, res) => {
   const { firstName } = req.body;
-  console.log("Generating suggested usernames for first name:", firstName);
 
   if (!firstName) {
     return res.status(400).json({
@@ -544,32 +536,36 @@ export const forgotPassword = async (req, res) => {
 
   if (!email) return res.status(400).json({message: "email required"})
 
+
   try {
-    const user = await User.findOne({normalisedEmail})
+    const user = await User.findOne({email})
     if(!user) return res.status(400).json({message: "User does not exist"})
-    if(user.resetPasswordTokenExpiresAt > new Date()) return res.status(400).json({message: "Reset password link already sent to your email"})
+    if(user.resetPasswordTokenExpiresAt && user.resetPasswordTokenExpiresAt.getTime() >  Date.now()) return res.status(400).json({message: "Reset password link already sent to your email"})
     const resetToken = crypto.randomBytes(20).toString("hex")
     const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex")
-    const resetTokenExpiry = Date.now() + (60* 60 * 1000)
+    const resetTokenExpiry = Date.now() + (15 * 60 * 1000)
 
-    user.resetPasswordToken = hashToken
+    user.resetPasswordToken = hashedToken
     user.resetPasswordTokenExpiresAt = resetTokenExpiry
 
     await user.save()
 
-    // send reset email
+    const resetURL = `${ENV.CLIENT_URL}reset-password/${resetToken}`
+
+    await sendResetPasswordEmail(user.email, user.firstName, resetURL)
+
     res.status(200).json({message: "Password reset sent to your email"})
 
   } catch (error) {
-    console.log("Error in forgot password", error)
     res.status(400).json({message: error.message})
   }
 }
 
 export const resetPassword = async(req, res) => {
-  const token = req.params
 
-  const password = req.body
+  const {token} = req.params
+
+  const {password} = req.body
 
   if (!password) return res.status(400).json({message: "Password required"})
 
@@ -579,35 +575,30 @@ export const resetPassword = async(req, res) => {
       !/[a-z]/.test(password) ||
       !/\d/.test(password) ||
       !/[^A-Za-z0-9]/.test(password)
-    ){
-        return res.status(400).json({ message: "Password must be at least 8 characters and include an uppercase, lowercase, a number and a special character" })
-    }
+  ){
+      return res.status(400).json({ message: "Password must be at least 8 characters and include an uppercase, lowercase, a number and a special character" })
+  }
 
-  const hashedResetToken = crypto.Hash("sha256").update(token).digest("hex")
+  const hashedResetToken = crypto.createHash("sha256").update(token).digest("hex")
 
   try {
-    const user = await User.findOneAndUpdate(
+    const user = await User.findOne(
       {
         resetPasswordToken: hashedResetToken,
-        resetPasswordTokenExpiresAt: {gt: Date.now()}
-      },
-      {
-        $set: { password },
-        $unset: { 
-          resetPasswordToken: undefined,
-          resetPasswordTokenExpiresAt: undefined
-        },   
-      },
-      { returnDocument: "after" }
+        resetPasswordTokenExpiresAt: {$gt: new Date()}
+      }
     )
     if(!user)return res.status(400).json({message: "Invalid or expired reset token"})
 
-    //send success email
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordTokenExpiresAt = undefined;
+
+    await user.save()
 
     res.status(200).json({message: "Password changed successfully"})
 
   } catch (error) {
-    console.log("Error in resetPassword")
     res.status(400).json({message: error.message})
   }
 

@@ -49,9 +49,7 @@ export default function VerifyEmailPage () {
 	try {
 		const result = await verifyEmail(verificationCode);
 		if (result?.success) navigate("/add-username");
-	} catch (error) {
-		console.log(error);
-	}
+	} catch (error) {	}
 	};
 
 	const handleTokenResend = async () => {
@@ -59,7 +57,6 @@ export default function VerifyEmailPage () {
 			const result = await resendVerificationToken(authUser.email);
 			if (result?.success) toast.success("Verification token resent successfully");
 		} catch (error) {
-			console.log(error);
 		}
 	};
 
@@ -70,7 +67,6 @@ export default function VerifyEmailPage () {
 			const result = await verifyEmail(verificationCode);
 			if (result?.success) navigate("/add-username");
 		} catch (error) {
-			console.log(error);
 		}
 	};
 

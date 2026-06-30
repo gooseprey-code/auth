@@ -17,7 +17,8 @@ const ENV = {
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     EMAIL_USER: process.env.EMAIL_USER,
     EMAIL_PASS: process.env.EMAIL_PASS,
-    CLIENT_URL: process.env.CLIENT_URL
+    CLIENT_URL: process.env.CLIENT_URL,
+    ARCJET_KEY: process.env.ARCJET_KEY,
 }
 
 export default ENV

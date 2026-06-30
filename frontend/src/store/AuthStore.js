@@ -16,6 +16,7 @@ export const useAuthStore = create (persist((set, get) => ({
     isUsernameAvailable: null,
     isSendingToken: false,
     usernameStatus: null,
+    isChangingPassword: false,
 
     signup: async (payload) => {
         set({ isSigningUp: true })
@@ -30,15 +31,30 @@ export const useAuthStore = create (persist((set, get) => ({
         }
     },
 
-    forgotPassword: async (payload) => {
+    forgotPassword: async (email) => {
         set({ isSigningIn: true })
         try {
-            const response = await axiosInstance.post("/auth/forgot-password",payload)
+            const response = await axiosInstance.post("/auth/forgot-password", { email })
             set({ authUser: response.data.user, message: response.data.message})
+            toast.success("Password reset link sent to your email")
             return {success: true}
         } catch (error) {
             toast.error(error?.response?.data?.message || "email sending failed try again")
             return {success: false}
+        }
+    },
+
+    resetPassword: async (password, token) => {
+        set({ isChangingPassword: true })
+        try {
+            const response = await axiosInstance.post(`/auth/reset-password/${token}`, { password })
+            set({ isChangingPassword: false })
+            toast.success("Password reset successful")
+            return { success: true }
+        } catch (error) {
+            set({ isChangingPassword: false })
+            toast.error(error?.response?.data?.message || "something went wrong during password reset")
+            return { success: false }
         }
     },
 
@@ -110,9 +126,7 @@ export const useAuthStore = create (persist((set, get) => ({
                 isAddingUsername: false,
                 usernameStatus: ""
             })
-            console.log(isAddingUsername);
             return { success: true }
-
         } catch (error) {
 
             const message =
@@ -132,9 +146,7 @@ export const useAuthStore = create (persist((set, get) => ({
     },
 
     usernameAvailabilityCheck: async(username) => {
-        console.log("Before check:", get().authUser);
         set ({ isCheckingUsername: true })
-        console.log("After set true:", get().authUser); 
         try {
             const response = await axiosInstance.post("/auth/username-availability/", {username})
             set({ isUsernameAvailable: response?.data?.success, usernameStatus: response?.data?.message})
@@ -142,7 +154,6 @@ export const useAuthStore = create (persist((set, get) => ({
             return response?.data?.success
         } catch (error) {
             set({ isUsernameAvailable: false, usernameStatus: error?.response?.data?.message || "Error checking username availability" })
-            console.log("After set false:", get().authUser);
         }finally {
             set({ isCheckingUsername: false })
         }

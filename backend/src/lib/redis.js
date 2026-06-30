@@ -8,7 +8,6 @@ export const redis = new Redis (ENV.UPSTASH_REDIS_URL, {
 })
 
 redis.on("connect", () => {
-  console.log("✅ Connected to Upstash Redis");
 });
 
 redis.on("error", (err) => {

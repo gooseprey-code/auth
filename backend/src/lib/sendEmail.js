@@ -22,7 +22,7 @@ const sendResetPasswordEmail = async (reciepient, userName, clientURL) => {
     const info = await transporter.sendMail({
       from: ENV.EMAIL_USER,
       to: `${reciepient}`,
-      subject: `Email Verification`,
+      subject: `Reset Password`,
       html: createResetPasswordTemplate(userName, clientURL),
     });
     console.log("Email sent:", info.messageId);

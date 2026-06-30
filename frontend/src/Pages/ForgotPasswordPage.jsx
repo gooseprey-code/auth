@@ -1,13 +1,25 @@
 import { Mail } from "lucide-react"
-import { NavLink } from "react-router-dom"
+import { NavLink, useNavigate } from "react-router-dom"
+import { useAuthStore } from "../store/AuthStore";
+import { useState } from "react";
 export default function ForgotPassword () {
+
+    const [email, setEmail] = useState("")
+
+    const forgotPassword = useAuthStore((state) => state.forgotPassword);
+
+    const handleSubmit = async(e) => {
+        e.preventDefault()
+        await forgotPassword(email)
+    }
     return (
         <div  className="w-full mt-20 dark:text-white flex flex-col justify-center items-center px-8 mb-15">
             <div className="flex flex-col gap-2 mb-8 justify-center items-center ">
                 <h2 className="text-stone-800 dark:text-white font-bold text-3xl tracking-wide mb-2">Forgot Your Password</h2>
                 <p className="text-stone-600 font-medium text-sm dark:text-white text-center">Enter your email address and we'll send you a link to reset your password.</p>
             </div>
-            <form  className="my-5 md:w-1/3 w-9/10 flex flex-col items-center justify-center">
+            <form onSubmit={handleSubmit}
+              className="my-5 md:w-1/3 w-9/10 flex flex-col items-center justify-center">
                 <div className="border-b border-stone-400 my-10 relative flex items-center">
                     <Mail className="size-5 text-stone-600 dark:text-white"/>
                     <input
@@ -15,7 +27,7 @@ export default function ForgotPassword () {
                         id="email"
                         type="email"
                         placeholder="Email"
-                        onChange={ (e) => {setPayload({ ...payload, email: e.target.value })} }
+                        onChange={ (e) => setEmail(e.target.value)}
                         required
                     />
                 </div>

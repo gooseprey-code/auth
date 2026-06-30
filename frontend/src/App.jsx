@@ -11,6 +11,7 @@ import Header from './Components/Header'
 import Footer from './Components/Footer'
 import ForgotPassword from './Pages/ForgotPasswordPage'
 import ResetPassword from './Pages/ResetPasswordPage'
+import ArticlesPage from './Pages/ArticlesPage'
 
 
 
@@ -60,7 +61,7 @@ function App() {
   } 
 
   return (
-    <div className="dark:bg-black w-full m-0 p-0 min-h-screen flex flex-col overflow-x-hidden">
+    <div className="dark:bg-black w-full m-0 p-0 min-h-screen flex flex-col bg-stone-50 overflow-x-hidden">
       <Header />
       <div className='mt-20'>
         <Routes>
@@ -100,12 +101,14 @@ function App() {
               <ForgotPassword />
             </RedirectUser>
           } />
-          <Route path="/reset-password" element={ 
+          <Route path="/reset-password/:token" element={ 
             <RedirectUser>
               <ResetPassword />
             </RedirectUser> 
           } />
 
+          <Route path="/articles-page/:id" element={<ArticlesPage />} />
+          <Route path='*' element={<UserDashboardPage />} />
         </Routes>
       </div>
       

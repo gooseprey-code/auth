@@ -16,12 +16,22 @@ app.use(
     credentials: true,
   })
 );
+app.set("trust proxy", 1);
+
+app.get("/ip", (req, res) => {
+  res.json({
+    ip: req.ip,
+    forwarded: req.headers["x-forwarded-for"],
+  });
+});
 
 app.use(express.json())
 
 app.use(cookieParser())
 
 app.use("/api/auth", authRoutes)
+
+
 
 const startServer = () => {
     app.listen(ENV.PORT, () => {

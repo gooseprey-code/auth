@@ -52,13 +52,13 @@ export default function SignupPage () {
     }
 
     return (
-        <div className="overflow-x-hidden dark:bg-black dark:text-white w-full flex flex-col justify-center items-center bg-white px-8 mt-15 mb-10">
+        <div className="overflow-x-hidden dark:bg-black dark:text-white w-full flex flex-col justify-center items-center px-8 mt-10 mb-10">
             <div className="flex flex-col gap-2 mb-6 justify-center items-center ">
                 <h2 className="text-stone-800 dark:text-white font-bold text-3xl tracking-wide mb-2">Create an Account</h2>
                 <p className="text-stone-600 font-medium dark:text-white text-sm">Already have an account?  <NavLink to="/login" className="text-blue-700 hover:underline py-1 px-2">Sign In</NavLink></p>
             </div>
-            <form className="md:w-1/3 w-9/10 flex flex-col gap-2 sm:gap-4 justify-content items-center" onSubmit={handleSubmit}>
-                <div className="border-b dark:text-white border-stone-400 my-6 relative pb-2 flex items-center">
+            <form className="md:w-1/3 w-9/10 flex flex-col gap-1 justify-content items-center" onSubmit={handleSubmit}>
+                <div className="border-b dark:text-white border-stone-400 my-4 relative pb-2 flex items-center">
                     <User className="size-5 text-stone-600 dark:text-white"/>
                     <input
                         className="dark:text-white focus:outline-none focus:ring-0 bg-none px-1 ml-2 text-black focus:border-none tracking-wider font-bold text-lg placeholder:font-normal w-full"
@@ -70,7 +70,7 @@ export default function SignupPage () {
                         required
                     />
                 </div>
-                <div className="border-b dark:text-white border-stone-400 my-6 relative pb-2 flex items-center">
+                <div className="border-b dark:text-white border-stone-400 my-4 relative pb-2 flex items-center">
                     <User className="size-5 text-stone-600 dark:text-white"/>
                     <input
                         className="focus:outline-none dark:text-white focus:ring-0 bg-none px-1 ml-2 text-black focus:border-none tracking-wider font-bold text-lg placeholder:font-normal w-full"
@@ -82,7 +82,7 @@ export default function SignupPage () {
                         required
                     />
                 </div>
-                <div className="border-b border-stone-400 my-6 relative pb-2 flex items-center">
+                <div className="border-b border-stone-400 my-4 relative pb-2 flex items-center">
                     <Mail className="size-5 dark:text-white text-stone-600"/>
                     <input
                         className="dark:text-white focus:outline-none focus:ring-0 bg-none px-1 ml-2 text-black focus:border-none tracking-wider font-bold text-lg placeholder:font-normal w-full"
@@ -94,7 +94,7 @@ export default function SignupPage () {
                         required
                     />
                 </div>
-                <div className="border-b border-stone-400 my-6 relative pb-2 flex items-center">
+                <div className="border-b border-stone-400 my-4 relative pb-2 flex items-center">
                     <LockKeyhole className="size-5 dark:text-white text-stone-600"/>
                     <div className="flex justify-between w-full">
                         <input
@@ -123,7 +123,7 @@ export default function SignupPage () {
                 <div>
                     {payload.password && <PasswordStrengthMeter password={payload.password}/>}
                 </div>
-                <div className={"border-b border-stone-400 dark:text-white my-6 relative pb-2 flex items-center"}>
+                <div className={"border-b border-stone-400 dark:text-white my-4 relative pb-2 flex items-center"}>
                     <LockKeyhole className="size-5 dark:text-white text-stone-600"/>
                     <input
                         className="focus:outline-none dark:text-white focus:ring-none bg-none px-1 ml-2 text-black focus:border-none tracking-widest font-bold text-lg placeholder:font-normal placeholder:tracking-wider w-full"
@@ -145,7 +145,7 @@ export default function SignupPage () {
                     }
                 </div>
                 }
-                <div className="px-10 text-center py-1 rounded-4xl bg-blue-700 text-md font-normal text-white relative">
+                <div className="px-10 text-center py-1 rounded-4xl bg-blue-700 text-md font-normal text-white relative my-5">
                     <button type="submit">
                         {
                             isSigningup? "Signing up..." : "Sign Up"
@@ -153,7 +153,6 @@ export default function SignupPage () {
                     </button>
                     <ArrowRight className="w-5 h-5 bg-blue-400 absolute rounded-full top-1/2 -translate-y-1/2 right-2"/>
                 </div>
-                <p>Or</p>
                 <GoogleLogin
                     onSuccess={async (credentialResponse) => {
                         const result = await googleLogin(credentialResponse.credential);
@@ -168,7 +167,6 @@ export default function SignupPage () {
                     text="signup_with"
                     width="200"
                 />
-             
             </form>
         </div>
     )
